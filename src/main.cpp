@@ -1,20 +1,40 @@
-#include <Arduino.h>
+#define BLINKER_PRINT Serial
+#define BLINKER_MQTT
 
-// put function declarations here:
-int myFunction(int, int);
+#include <Blinker.h>
+
+char auth[] = "Your MQTT Secret Key";
+char ssid[] = "Your WiFi network SSID or name";
+char pswd[] = "Your WiFi network WPA password or WEP key";
+
+#define BUTTON_1 "ButtonKey"
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+    Serial.begin(115200);
 
-  int test;
+    // pinMode(12, OUTPUT);
+    // digitalWrite(12, LOW);
+
+    Blinker.begin(auth, ssid, pswd);
+    Blinker.wInit(BUTTON_1, W_BUTTON);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
+void loop()
+{
+    Blinker.run();
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+    if (Blinker.available()) {
+        BLINKER_LOG2("Blinker.readString(): ", Blinker.readString());
+
+        uint32_t BlinkerTime = millis();
+
+        Blinker.beginFormat();
+        Blinker.vibrate();        
+        Blinker.print("millis", BlinkerTime);
+        Blinker.endFormat();
+    }
+
+    if (Blinker.button(BUTTON_1)) {
+        // digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    }
 }
